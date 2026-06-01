@@ -16,16 +16,24 @@ if ! source "$(dirname "$(readlink -f "$0")")/Global_functions.sh"; then
   exit 1
 fi
 
-# Check if Hyprland-Dots exists
-printf "${NOTE} Cloning and Installing ${SKY_BLUE}KooL's Hyprland Dots${RESET}....\n"
+# Restore local hyprland configs
+printf "${NOTE} Restoring ${SKY_BLUE}local Hyprland configs${RESET}....\n"
 
-rm -rf Hyprland-Dots
-if cp -r local-hypr-configs ./Hyprland-Dots; then
-  cd Hyprland-Dots || exit 1
-  chmod +x copy.sh
-  ./copy.sh 
+HYPR_DIR="$HOME/.config/hypr"
+
+# Backup current config if it exists
+if [ -d "$HYPR_DIR" ]; then
+  BACKUP="$HYPR_DIR.bak.$(date +%Y%m%d-%H%M%S)"
+  printf "${NOTE} Backing up current config to ${SKY_BLUE}${BACKUP}${RESET}\n"
+  cp -r "$HYPR_DIR" "$BACKUP"
+fi
+
+# Copy local configs
+mkdir -p "$HYPR_DIR"
+if cp -rf local-hypr-configs/* "$HYPR_DIR/"; then
+  printf "${OK} Local Hyprland configs restored successfully!\n"
 else
-  echo -e "$ERROR Can't copy local-hypr-configs"
+  echo -e "$ERROR Failed to restore local-hypr-configs"
 fi
 
 printf "\n%.0s" {1..2}
